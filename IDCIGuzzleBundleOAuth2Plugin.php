@@ -1,6 +1,6 @@
 <?php
 
-namespace IDCI\Bundle\GuzzleBundleOAuth2PluginBundle;
+namespace IDCI\Bundle\GuzzleBundleOAuth2Plugin;
 
 use EightPoints\Bundle\GuzzleBundle\PluginInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class IDCIGuzzleBundleOAuth2PluginBundle extends Bundle implements PluginInterface
+class IDCIGuzzleBundleOAuth2Plugin extends Bundle implements PluginInterface
 {
     public function getPluginName() : string
     {
@@ -65,6 +65,7 @@ class IDCIGuzzleBundleOAuth2PluginBundle extends Bundle implements PluginInterfa
     public function loadForClient(array $config, ContainerBuilder $container, string $clientName, Definition $handler) : void
     {
         if ($config['enabled']) {
+            dd('loadForClient');
         }
     }
 }

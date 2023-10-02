@@ -28,7 +28,7 @@
     },
     "autoload": {
         "psr-4": {
-            "IDCI\\Bundle\\GuzzleBundleOAuth2PluginBundle\\": ""
+            "IDCI\\Bundle\\GuzzleBundleOAuth2Plugin\\": ""
         },
         "exclude-from-classmap": [
             "/Tests/"
@@ -36,7 +36,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "IDCI\\Bundle\\GuzzleBundleOAuth2PluginBundle\\Tests\\": "Tests"
+            "IDCI\\Bundle\\GuzzleBundleOAuth2Plugin\\Tests\\": "Tests"
         }
     }
 }
