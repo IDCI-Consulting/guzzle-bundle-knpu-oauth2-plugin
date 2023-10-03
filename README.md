@@ -59,7 +59,7 @@ knpu_oauth2_client:
 ```
 
 Then when you wants to automatically add a bearer token to your Guzzle client request, simply use the `knpu_oauth2` plugin configuration into `config/packages/eight_points_guzzle.yaml`.
-Here is an example that use the `keycloak` KnpUOAuth2 client:
+Here is an example that use the `my_keycloak_client` KnpUOAuth2 client:
 ```yaml
 eight_points_guzzle:
     clients:
