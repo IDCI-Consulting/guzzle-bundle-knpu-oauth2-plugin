@@ -1,9 +1,9 @@
 {
-    "name": "idci/guzzle-bundle-oauth2-plugin",
+    "name": "idci/guzzle-bundle-knpu-oauth2-plugin",
     "type": "symfony-bundle",
-    "description": "This bundle integrates OAuth2 functionality using a Guzzle Bundle plugin.",
+    "description": "This bundle integrates KnpU OAuth2 functionality using a Guzzle Bundle plugin.",
     "license": "MIT",
-    "keywords": ["Guzzle", "OAuth2"],
+    "keywords": ["Guzzle", "KnpU", "OAuth2", "Plugin", "Bearer", "JWT"],
     "authors": [
         {
             "name": "Gabriel BONDAZ",
