@@ -2,8 +2,8 @@
 
 namespace IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\Middleware;
 
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
+use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,19 +12,18 @@ use Psr\Http\Message\ResponseInterface;
 //use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
 //use Sainsburys\Guzzle\Oauth2\GrantType\RefreshTokenGrantTypeInterface;
 
-class OAuthMiddleware
+class OAuth2Middleware
 {
-    protected ClientInterface $client;
+    protected ?OAuth2ClientInterface $client;
 
-    protected array $options;
+    public function __construct()
+    {
+        $this->client = null;
+    }
 
-    protected ?AccessTokenInterface $accessToken;
-
-    public function __construct(ClientInterface $client, array $options)
+    public function setClient(OAuth2ClientInterface $client)
     {
         $this->client = $client;
-        $this->options = $options;
-        $this->accessToken = null;
     }
 
     /**
@@ -34,16 +33,13 @@ class OAuthMiddleware
     {
         return function (callable $handler) {
             return function (RequestInterface $request, array $options) use ($handler) {
-                // $this->grantType instanceof GrantTypeInterface && $this->grantType->getConfigByName(GrantTypeBase::CONFIG_TOKEN_URL) != $request->getUri()->getPath()
-                if (isset($options['auth']) && 'oauth2' == $options['auth']) {
+                if (isset($options['auth']) && 'knpu_oauth2' == $options['auth']) {
                     $token = $this->getAccessToken();
 
-                    if ($token !== null) {
-                        $request->withAddedHeader('Authorization', sprintf('Bearer %s', $token->getToken()));
+                    if (null !== $token) {
+                        $request = $request->withAddedHeader('Authorization', sprintf('Bearer %s', $token->getToken()));
                     }
                 }
-
-                dd($request);
 
                 return $handler($request, $options);
             };
@@ -86,15 +82,16 @@ class OAuthMiddleware
         */
     }
 
-    public function getAccessToken(): AccessTokenInterface
+    public function getAccessToken(): ?AccessTokenInterface
     {
-        if (!($this->accessToken instanceof AccessTokenInterface) || $this->accessToken->hasExpired()) {
-            $this->acquireAccessToken();
+        try {
+            return $this->client->getOAuth2Provider()->getAccessToken('client_credentials');
+        } catch (\Exception $e) {
+            dd($e);
         }
-
-        return $this->accessToken;
     }
 
+    /*
     protected function acquireAccessToken(): AccessTokenInterface
     {
         dd('acquireAccessToken');
@@ -113,12 +110,9 @@ class OAuthMiddleware
 
         return $this->accessToken;
     }
+    */
 
-    /**
-     * Get the refresh token.
-     *
-     * @return AccessToken|null
-     */
+    /*
     public function getRefreshToken()
     {
         if ($this->accessToken instanceof AccessToken) {
@@ -127,16 +121,9 @@ class OAuthMiddleware
 
         return null;
     }
+    */
 
-    /**
-     * Set the access token.
-     *
-     * @param AccessToken|string $accessToken
-     * @param string             $type
-     * @param int                $expires
-     *
-     * @return self
-     */
+    /*
     public function setAccessToken($accessToken, $type = null, $expires = null)
     {
         if (is_string($accessToken)) {
@@ -156,14 +143,9 @@ class OAuthMiddleware
 
         return $this;
     }
+    */
 
-    /**
-     * Set the refresh token.
-     *
-     * @param AccessToken|string $refreshToken The refresh token
-     *
-     * @return self
-     */
+    /*
     public function setRefreshToken($refreshToken)
     {
         if (!($this->accessToken instanceof AccessToken)) {
@@ -184,4 +166,5 @@ class OAuthMiddleware
 
         return $this;
     }
+    */
 }
