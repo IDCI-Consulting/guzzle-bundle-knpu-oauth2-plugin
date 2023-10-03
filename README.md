@@ -43,7 +43,7 @@ Here is an example using a Keycloak client:
 ```yaml
 knpu_oauth2_client:
     clients:
-        keycloak:
+        my_keycloak_client:
             type: keycloak
             auth_server_url: '%env(string:KEYCLOAK_SERVER_BASE_URL)%'
             realm: '%env(string:KEYCLOAK_REALM)%'
@@ -69,5 +69,5 @@ eight_points_guzzle:
                 auth: knpu_oauth2
             plugin:
                 knpu_oauth2:
-                    client: keycloak
+                    client: my_keycloak_client
 ```
