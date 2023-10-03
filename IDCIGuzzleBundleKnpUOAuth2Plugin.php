@@ -61,8 +61,14 @@ class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
         ;
     }
 
+    public function load(array $configs, ContainerBuilder $container) : void
+    {
+        return;
+    }
+
     public function loadForClient(array $configuration, ContainerBuilder $container, string $clientName, Definition $handler) : void
     {
+        dd('here');
         /*
         if (!$configuration['enabled']) {
             return;
