@@ -71,3 +71,48 @@ eight_points_guzzle:
                 knpu_oauth2:
                     client: my_keycloak_client
 ```
+
+If you wants to store your bearer token, you can use the `persistent` option to true.
+By default this bundle use the `cache.app` service to store the bearer token, but you can change this with the `cache_service_id` option.
+Here is an example that store your bearer token using a custom `Symfony\Component\Cache\Adapter\RedisAdapter` service.
+
+`config/services.yaml`:
+```yaml
+services:
+    app.redis_provider:
+        class: \Redis
+        factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
+        arguments:
+            - 'redis://%env(resolve:REDIS_HOST)%'
+
+    app.cache.adapter.redis.keycloak:
+        parent: 'cache.adapter.redis'
+        tags:
+            - { name: 'cache.pool', namespace: 'KEYCLOAK' }
+```
+
+`config/packages/cache.yaml`:
+```yaml
+framework:
+    cache:
+        pools:
+            app.keycloak.cache:
+                default_lifetime: 600 # Ten minutes
+                adapter: app.cache.adapter.redis.keycloak
+                provider: app.redis_provider
+```
+
+`config/packages/eight_points_guzzle.yaml`:
+```yaml
+eight_points_guzzle:
+    clients:
+        my_guzzle_client:
+            base_url: '%env(string:MY_GUZZLE_CLIENT_ENV_BASE_URL)%'
+            options:
+                auth: knpu_oauth2
+            plugin:
+                knpu_oauth2:
+                    client: my_keycloak_client
+                    persistent: true
+                    cache_service_id: app.keycloak.cache
+```

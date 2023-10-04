@@ -6,6 +6,7 @@ use EightPoints\Bundle\GuzzleBundle\PluginInterface;
 use IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\DependencyInjection\Compiler\InjectMiddlewareKnpUOAuthClientCompilerPass;
 use IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\DependencyInjection\IDCIGuzzleBundleKnpUOAuth2PluginExtension;
 use IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\Middleware\OAuth2Middleware;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -32,6 +33,9 @@ class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
             ->end()
             ->children()
                 ->scalarNode('client')->defaultNull()->end()
+                ->booleanNode('persistent')->defaultFalse()->end()
+                ->scalarNode('cache_service_id')->defaultValue('cache.app')->end()
+                ->integerNode('retry_limit')->min(0)->defaultValue(5)->end()
             ->end();
         ;
     }
@@ -49,19 +53,20 @@ class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
 
         $knpuClientDefinitionName = sprintf('knpu.oauth2.client.%s', $configuration['client']);
 
-        // Define Middleware
         $oAuth2MiddlewareDefinitionName = sprintf('idci_guzzle_bundle_knpu_oauth2_plugin.middleware.%s', $clientName);
         $oAuth2MiddlewareDefinition = new Definition(OAuth2Middleware::class);
         $oAuth2MiddlewareDefinition->setPublic(true);
         $oAuth2MiddlewareDefinition->addTag('idci_guzzle_bundle_knpu_oauth2_plugin.middleware');
         $oAuth2MiddlewareDefinition->setProperty('knpu_oauth2_client', $knpuClientDefinitionName);
+
+        if ($configuration['persistent']) {
+            $oAuth2MiddlewareDefinition->setProperty('cache_service_id', $configuration['cache_service_id']);
+        }
+
         $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
         $onBeforeExpression = new Expression(sprintf('service("%s").onBefore()', $oAuth2MiddlewareDefinitionName));
-        //$onFailureExpression = new Expression(sprintf('service("%s").onFailure(%d)', $oAuth2MiddlewareDefinitionName, $configuration['retry_limit']));
-
         $handler->addMethodCall('push', [$onBeforeExpression]);
-        //$handler->addMethodCall('push', [$onFailureExpression]);
     }
 
     public function build(ContainerBuilder $container)
