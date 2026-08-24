@@ -58,23 +58,16 @@ class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
         $oAuth2MiddlewareDefinition = new Definition(OAuth2Middleware::class);
         $oAuth2MiddlewareDefinition->setPublic(true);
         $oAuth2MiddlewareDefinition->addTag('idci_guzzle_bundle_knpu_oauth2_plugin.middleware');
-        $oAuth2MiddlewareDefinition->setProperty('knpu_oauth2_client', $knpuClientDefinitionName);
         $oAuth2MiddlewareDefinition->addMethodCall('setCacheKey', [$configuration['cache_key']]);
+        $oAuth2MiddlewareDefinition->addMethodCall('setClient', [new Reference($knpuClientDefinitionName)]);
 
         if ($configuration['persistent']) {
-            $oAuth2MiddlewareDefinition->setProperty('cache_service_id', $configuration['cache_service_id']);
+            $oAuth2MiddlewareDefinition->addMethodCall('setCache', [new Reference($configuration['cache_service_id'])]);
         }
 
         $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
         $onBeforeExpression = new Expression(sprintf('service("%s").onBefore()', $oAuth2MiddlewareDefinitionName));
         $handler->addMethodCall('push', [$onBeforeExpression]);
-    }
-
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new InjectMiddlewareKnpUOAuthClientCompilerPass());
     }
 }
