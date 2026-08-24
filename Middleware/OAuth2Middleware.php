@@ -16,10 +16,13 @@ class OAuth2Middleware
 
     private ?AdapterInterface $cache;
 
+    private ?string $cacheKey;
+
     public function __construct()
     {
         $this->client = null;
         $this->cache = null;
+        $this->cacheKey = null;
     }
 
     public function setClient(OAuth2ClientInterface $client)
@@ -30,6 +33,11 @@ class OAuth2Middleware
     public function setCache(AdapterInterface $cache)
     {
         $this->cache = $cache;
+    }
+
+    public function setCacheKey(string $cacheKey)
+    {
+        $this->cacheKey = $cacheKey;
     }
 
     public function onBefore()
@@ -54,7 +62,7 @@ class OAuth2Middleware
         $accessToken = null;
 
         if (null !== $this->cache) {
-            $accessToken = $this->cache->get('access_token', function (ItemInterface $item): AccessTokenInterface {
+            $accessToken = $this->cache->get($this->cacheKey, function (ItemInterface $item): AccessTokenInterface {
                 $accessToken = $this->client->getOAuth2Provider()->getAccessToken('client_credentials');
                 $expireAt = \DateTime::createFromFormat('U', $accessToken->getExpires());
                 $item->expiresAt($expireAt);
