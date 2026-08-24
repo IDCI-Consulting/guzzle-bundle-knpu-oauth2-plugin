@@ -35,6 +35,7 @@ class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
                 ->scalarNode('client')->defaultNull()->end()
                 ->booleanNode('persistent')->defaultFalse()->end()
                 ->scalarNode('cache_service_id')->defaultValue('cache.app')->end()
+                ->scalarNode('cache_key')->defaultValue('access_token')->end()
                 ->integerNode('retry_limit')->min(0)->defaultValue(5)->end()
             ->end();
         ;
@@ -58,6 +59,7 @@ class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
         $oAuth2MiddlewareDefinition->setPublic(true);
         $oAuth2MiddlewareDefinition->addTag('idci_guzzle_bundle_knpu_oauth2_plugin.middleware');
         $oAuth2MiddlewareDefinition->setProperty('knpu_oauth2_client', $knpuClientDefinitionName);
+        $oAuth2MiddlewareDefinition->addMethodCall('setCacheKey', [$configuration['cache_key']]);
 
         if ($configuration['persistent']) {
             $oAuth2MiddlewareDefinition->setProperty('cache_service_id', $configuration['cache_service_id']);
