@@ -2,11 +2,9 @@
 
 namespace IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\Middleware;
 
-use GuzzleHttp\Promise\PromiseInterface;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
