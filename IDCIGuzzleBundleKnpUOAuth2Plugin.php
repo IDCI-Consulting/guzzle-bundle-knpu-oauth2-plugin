@@ -3,10 +3,7 @@
 namespace IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin;
 
 use EightPoints\Bundle\GuzzleBundle\PluginInterface;
-use IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\DependencyInjection\Compiler\InjectMiddlewareKnpUOAuthClientCompilerPass;
-use IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\DependencyInjection\IDCIGuzzleBundleKnpUOAuth2PluginExtension;
 use IDCI\Bundle\GuzzleBundleKnpUOAuth2Plugin\Middleware\OAuth2Middleware;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -16,18 +13,18 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
 {
-    public function getPluginName() : string
+    public function getPluginName(): string
     {
         return 'knpu_oauth2';
     }
 
-    public function addConfiguration(ArrayNodeDefinition $pluginNode) : void
+    public function addConfiguration(ArrayNodeDefinition $pluginNode): void
     {
         $pluginNode
             ->canBeEnabled()
             ->validate()
                 ->ifTrue(function (array $config) {
-                    return $config['enabled'] === true && empty($config['client']);
+                    return true === $config['enabled'] && empty($config['client']);
                 })
                 ->thenInvalid('client is required')
             ->end()
@@ -38,15 +35,13 @@ class IDCIGuzzleBundleKnpUOAuth2Plugin extends Bundle implements PluginInterface
                 ->scalarNode('cache_key')->defaultValue('access_token')->end()
                 ->integerNode('retry_limit')->min(0)->defaultValue(5)->end()
             ->end();
-        ;
     }
 
-    public function load(array $configs, ContainerBuilder $container) : void
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        return;
     }
 
-    public function loadForClient(array $configuration, ContainerBuilder $container, string $clientName, Definition $handler) : void
+    public function loadForClient(array $configuration, ContainerBuilder $container, string $clientName, Definition $handler): void
     {
         if (!$configuration['enabled']) {
             return;
